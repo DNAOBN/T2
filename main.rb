@@ -8,6 +8,7 @@ require './models/identidade.rb'
 ActiveRecord::Base.establish_connection :adapter => "sqlite3",
                                         :database => "database.sqlite3"
 
+# Enum de comandos possíveis
 $commands = {
   "insere"  => 0,
   "altera"  => 1,
@@ -18,6 +19,7 @@ $commands = {
   "sair"    => 6
 }
 
+# Hash para facilitar escolha das tabelas pela linha de comando
 $tables = {
     "discentes"   => Discente,
     "docentes"    => Docente,
@@ -46,6 +48,7 @@ def insert(table, params)
   puts(entry.inspect)
   puts("-"*45)
 end
+
 
 def insert_relation(table, params)
   table = table.split("_")
@@ -111,6 +114,7 @@ def find(table, params)
   puts("-"*45)
 end
 
+
 def print_table(table)
   if table["_"]
     puts("# ERRO: Impossível imprimir tabela de relação n:n")
@@ -134,6 +138,7 @@ def print_table(table)
   puts("-" * 45)
 end
 
+
 def print_entry(table, params)
   t = $tables[table]
   entry = t.find(params["id"])
@@ -143,12 +148,14 @@ def print_entry(table, params)
   puts("-" * 45)
 end
 
+
 def print_tables()
   puts("-" * 45)
   puts("Tabelas:")
   puts(ActiveRecord::Base.connection.tables.map{|t| "- #{t}"})
   puts("-" * 45)
 end
+
 
 def parseParams(paramsString)
   params = paramsString.split(";").map{|p|
@@ -175,11 +182,16 @@ def parseParams(paramsString)
   return params
 end
 
+
 def checkForIdParam(params)
   if params["id"]
     puts("# ERRO: parâmetros de inserção não podem conter id")
   end
 end
+
+
+# MAIN PROGRAM #
+
 puts("-"*45)
 puts("Comandos:")
 puts("> tabelas")

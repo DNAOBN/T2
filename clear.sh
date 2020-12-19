@@ -1,1 +1,0 @@
-rm database.sqlite3
