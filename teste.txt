@@ -2,7 +2,13 @@ insere discentes nome:Joao
 insere discentes nome:Felipe
 insere discentes nome:Igor
 imprime discentes
+insere identidades grr:GRR20171234; cpf:"123.123.123-12"
+imprime identidades
+altera discentes id:1; identidade_id:1;
+imprime discentes id:1
 insere disciplinas nome:Algoritmos; carga_horaria: 60
 insere disciplinas nome:Programacao Web; carga_horaria: 60
 imprime disciplinas
-insere discentes_disciplinas discente_id:1 disciplina_id:1
+insere docentes nome:Roberto Hexsel
+insere docentes nome: 
+insere discentes_disciplinas discente_id:1; disciplina_id:1

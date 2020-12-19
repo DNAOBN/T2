@@ -23,22 +23,15 @@ $tables = {
     "docentes"    => Docente,
     "disciplinas" => Disciplina,
     "identidades" => Identidade,
+    "discente"   => Discente,
+    "docente"    => Docente,
+    "disciplina" => Disciplina,
+    "identidade" => Identidade,
     "Discente"   => Discente,
     "Docente"    => Docente,
     "Disciplina" => Disciplina,
     "Identidade" => Identidade,
-    "discentes_disciplinas" => :discentes_disciplinas
-  }
-
-$table_ids = {
-    "discente"   => "discentes_id",
-    "docente"    => "docentes_id",
-    "disciplina" => "disciplina_id",
-    "identidade" => "identidade_id",
-    "Discente"   => "discentes_id",
-    "Docente"    => "docentes_id",
-    "Disciplina" => "disciplina_id",
-    "Identidade" => "identidade_id",
+    "discentes_disciplinas" => "discentes_disciplinas"
   }
 
 def insert(table, params)
@@ -55,10 +48,17 @@ def insert(table, params)
 end
 
 def insert_relation(table, params)
-  puts()
-  disciplina = Disciplina.find(params["disciplina_id"])
-  discente = Discente.find(params["discente_id"])
-  discente.disciplinas << disciplina
+  table = table.split("_")
+  table_1 = table[0].chop
+  table_2 = table[1].chop
+  object_1 = $tables["#{table_1}s"].find(params["#{table_2}_id"])
+  object_2 = $tables["#{table_2}s"].find(params["#{table_1}_id"])
+
+  if (table_2 == "disciplina")
+   object_1.disciplinas << object_2
+  elsif (table_1 == "disciplina")
+    object_2.disciplinas << object_1
+  end
 end
 
 
@@ -112,6 +112,10 @@ def find(table, params)
 end
 
 def print_table(table)
+  if table["_"]
+    puts("# ERRO: Impossível imprimir tabela de relação n:n")
+    return
+  end
   puts("-" * 45)
   t = $tables[table]
   puts("Tabela #{t.name}:")
@@ -136,12 +140,6 @@ def print_entry(table, params)
   puts("-" * 45)
   puts("Linha #{params["id"]} da tabela #{t.name}:")
   puts(entry.inspect)
-  tables = entry.class.reflect_on_all_associations.map(&:name)
-  for paramTable in tables
-    puts(paramTable.inspect)
-    puts(t.attributes)
-    # puts($tables[paramTable].find(t[]).inspect)
-  end
   puts("-" * 45)
 end
 
@@ -177,18 +175,41 @@ def parseParams(paramsString)
   return params
 end
 
+def checkForIdParam(params)
+  if params["id"]
+    puts("# ERRO: parâmetros de inserção não podem conter id")
+  end
+end
+puts("-"*45)
 puts("Comandos:")
-puts("1 - insere  [tabela] [params]")
-puts("2 - altera  [tabela] id: x; [params]")
-puts("3 - deleta  [tabela] id: x")
-puts("4 - procura [tabela] [params]")
-puts("5 - imprime [tabela]")
-puts("6 - imprime [tabela] id: x")
-puts("7 - tabelas")
-puts("8 - sair")
+puts("> tabelas")
+puts("  + Lista as tabelas disponíveis")
+puts()
+puts("> imprime [tabela]")
+puts("  + Imprime colunas e conteúdo da tabela")
+puts()
+puts("> imprime [tabela] id: x")
+puts("  + Imprime linha com id x da tabela")
+puts()
+puts("> insere  [tabela] [params]")
+puts("  + Imprime linha com id x da tabela")
+puts()
+puts("> altera  [tabela] id: x; [params]")
+puts("  + Altera o registro de id x")
+puts()
+puts("> deleta  [tabela] id: x")
+puts("  + Deleta o registro de id x")
+puts()
+puts("> procura [tabela] [params]")
+puts("  + Procura o registro com os parâmetros passados")
+puts()
+puts("> sair")
+puts("  + Sai do programa")
+puts()
 puts("OBS:")
 puts("- Params no formato 'chave_1:valor; chave_2:valor'")
 puts("- Conteúdo entre aspas é interpretado como string")
+puts("-"*45)
 
 while true
   print("$ ")
@@ -228,6 +249,7 @@ while true
   if !wrongInput
     case $commands[command]
     when $commands["insere"]
+      checkForIdParam(params)
       insert(table, params)
     when $commands["altera"]
       edit(table, params)
@@ -241,7 +263,6 @@ while true
       else
         print_table(table)
       end
-    when $commands["imprime"]
     when $commands["tabelas"]
       print_tables()
     when $commands["sair"]

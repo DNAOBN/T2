@@ -15,14 +15,14 @@ end
 
 ActiveRecord::Base.connection.create_table :discentes do |c|
   c.string :nome
-  c.references :disciplina, foreign_key: true
+  c.references :disciplina
   c.references :identidade, foreign_key: true
 end
 
 ActiveRecord::Base.connection.create_table :disciplinas do |c|
   c.string :nome
   c.integer :carga_horaria
-  c.references :discente, foreign_key: true
+  c.references :discente
   c.references :docente, foreign_key: true
 end
 
